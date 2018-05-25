@@ -1,0 +1,8 @@
+RabbitMQ_IP='10.0.8.47'
+RabbitMQ_Port=5671
+Agent_Location=https://repo.skygrid.cloud/repo/5.0.0/agents/hcp_linux_agent.sh
+Base_URL=https://10.0.8.47
+Proxy_URL=https://repo.skygrid.cloud/repo/5.0.0-6548/DCHQ_HyperVProxy_Install_Windows_v1.2.ps1
+Customizable_Title=HyperCloud
+Agent_for_Windows=https://repo.skygrid.cloud/repo/5.0.0/agents/hcp_agent_install_windows.ps1
+
