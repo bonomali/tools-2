@@ -1,58 +1,66 @@
 {
-    "setup_tenant" : false,
-    "tenant_params" : {
-        "tenant_username" : "tenant01@hypercloud.io",
-        "tenant_password" : "***",
-        "provider" : "aws"
-    },
     "setup_aws" : false,
-    "aws_params" : {
-        "name" : "hypergrid-demos-aws",
-        "username" : "***",
-        "password" : "***",
-        "groupName": "aws"
-    },
-    "setup_gcp" : false,
-    "gcp_params" : {
-        "name" : "hypergrid-demos-gcp",
-        "username" : "***",
-        "password" : "***",
-        "groupName": "gcp"
-    },
-    "setup_azure" : false,
-    "azure_params" : {
-        "name" : "hypergrid-demos-azure",
-        "email": "***",
-        "region" : "***",
-        "username" : "***",
-        "password" : "***",
-        "groupName" : "azure"
-    },
-    "setup_hyperv" : false,
-    "hyperv_params" : {
-        "cluster" : "SkyGridC01.skygrid.cloud"
-    },
-    "setup_vmware" : false,
-    "vmware_params" : {
-        "cluster" : "hgvcenter.skygrid.cloud"
-    },
-    "setup_blueprints" : true,
-    "blueprints" : [
-    "https://github.com/hypergrid-inc/HyperCloud-Blueprints/blob/master/Grafana%20%26%20InfluxDB_%20Monitoring%20%26%20Alerting%20Stack%20v2.txt?raw=true",
-    "https://github.com/hypergrid-inc/HyperCloud-Blueprints/blob/master/Jenkins.txt?raw=true",
-    "https://github.com/hypergrid-inc/HyperCloud-Blueprints/blob/master/3-Tier%20Java%20(Nginx-Tomcat-MySQL)/3-Tier%20Java%20(Nginx-Tomcat-MySQL).txt?raw=true",
-    "https://github.com/hypergrid-inc/HyperCloud-Blueprints/blob/master/HCP%20Reporter/Compose_HCP%20Reporter_2c9180866298794c016323a05e6932d3.txt?raw=true",
-    "https://github.com/hypergrid-inc/HyperCloud-Blueprints/blob/master/Wordpress%20with%20MySQL.txt?raw=true"
+    "aws_params" : [
+        {
+            "name" : "AWS.us-east-1.provider",
+            "username" : "",
+            "password" : "",
+            "groupName": "awsdemo"
+        }
     ],
-    "setup_plugins" : true,
-    "plugins" : [
-    "http://216.58.168.93:9000/plugins/plugin_Apache%20HTTP%20Load%20Balancer%20Plugin_1.0_uazUi.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Deploy%20Java%20War%20File%20Plugin_1.0_oncXN.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Deploy%20WebSphere%20War%20File%20Plugin_1.0_rPuVb.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Nginx%20Setup%20Plugin_1.0_0H1Nk.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Puppet%20Apache_1.0_UKweA.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Puppet%20Postgres_1.0_Yj5he.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Puppet%20Tomcat_1.0_Be69y.txt",
-    "http://216.58.168.93:9000/plugins/plugin_Puppet-Mongo_1.0_QA67s.txt"
+    "setup_gcp" : false,
+    "gcp_params" : [
+        {
+            "name" : "GCP.us-east1.provider",
+            "username" : "",
+            "password" : "",
+            "groupName": "gcpdemo"
+        }
+    ],
+    "setup_azure" : false,
+    "azure_params" : [
+        {
+            "name" : "ARM.eastus.provider",
+            "email": "",
+            "url" : "",
+            "username" : "",
+            "password" : "",
+            "groupName" : "azuredemo"
+        }
+    ],
+    "setup_blueprints" : false,
+    "setup_plugins" : false,
+    "setup_email" : false,
+    "setup_system" : false,
+    "setup_tenant" : true,
+    "tenant_params" : [
+        {
+            "tenant_contactname": "Handoyo Sutanto",
+            "tenant_username" : "handoyo",
+            "tenant_name" : "hypergrid.com",
+            "tenant_email" : "handoyo@hypergrid.com",
+            "tenant_phone" : "4086606871",
+            "tenant_password" : "",
+            "provider" : "AWS.us-east-1.provider",
+            "default_quota" :
+                {
+                    "quota_name" : "Q01",
+                    "qouta_type" : "open",  
+                    "quota_spendLimit" : 0,
+                    "quota_cpu" : 0,
+                    "quota_mem" : 0,
+                    "quota_disk" : 0,
+                    "quota_az" : "us-east-1a",
+                    "quota_vpc": "vpc-31b00254",
+                    "default_rp" : 
+                        {
+                            "rp_name" : "RP01",
+                            "rp_spendLimit" : 100,
+                            "rp_cpu" : 10,
+                            "rp_mem" : 10,
+                            "rp_disk" : 10
+                        }
+                }
+        }
     ]
 }
