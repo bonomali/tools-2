@@ -2,6 +2,7 @@ Python Script to setup HCP.
 
 Usage:
 To setup HCP, call the script with these following parameters:
+
 python hypercloud_setup.py https://<HCP_URL> <HCP_Username> <HCP_Password> .
 
 the '.' at the back determines that it will setup HCP using the setup.json
