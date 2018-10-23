@@ -41,26 +41,63 @@
             "tenant_email" : "handoyo@hypergrid.com",
             "tenant_phone" : "4086606871",
             "tenant_password" : "",
-            "provider" : "AWS.us-east-1.provider",
-            "default_quota" :
-                {
-                    "quota_name" : "Q01",
-                    "qouta_type" : "open",  
-                    "quota_spendLimit" : 0,
-                    "quota_cpu" : 0,
-                    "quota_mem" : 0,
-                    "quota_disk" : 0,
-                    "quota_az" : "us-east-1a",
-                    "quota_vpc": "vpc-31b00254",
-                    "default_rp" : 
-                        {
-                            "rp_name" : "RP01",
-                            "rp_spendLimit" : 100,
-                            "rp_cpu" : 10,
-                            "rp_mem" : 10,
-                            "rp_disk" : 10
-                        }
-                }
+            "quotas" :
+                [
+                    {
+                        "quota_provider" : "AWS.us-east-1.provider",
+                        "quota_name" : "Q01",
+                        "qouta_type" : "open",  
+                        "quota_spendLimit" : 0,
+                        "quota_cpu" : 0,
+                        "quota_mem" : 0,
+                        "quota_disk" : 0,
+                        "quota_az" : "us-east-1c",
+                        "quota_vpc": "vpc-c282c1b9",
+                        "rps" : [ 
+                            {
+                                "rp_name" : "RP01-01",
+                                "rp_spendLimit" : 100,
+                                "rp_cpu" : 10,
+                                "rp_mem" : 10,
+                                "rp_disk" : 10
+                            },
+                            {
+                                "rp_name" : "RP15-02",
+                                "rp_spendLimit" : 100,
+                                "rp_cpu" : 10,
+                                "rp_mem" : 10,
+                                "rp_disk" : 10
+                            }
+                        ]
+                    },
+                    {
+                        "quota_provider" : "AWS.us-east-1.provider",
+                        "quota_name" : "Q02",
+                        "qouta_type" : "open",  
+                        "quota_spendLimit" : 0,
+                        "quota_cpu" : 0,
+                        "quota_mem" : 0,
+                        "quota_disk" : 0,
+                        "quota_az" : "us-east-1b",
+                        "quota_vpc": "vpc-c88ecdb3",
+                        "rps" : [ 
+                            {
+                                "rp_name" : "RP02-01",
+                                "rp_spendLimit" : 100,
+                                "rp_cpu" : 10,
+                                "rp_mem" : 10,
+                                "rp_disk" : 10
+                            },
+                            {
+                                "rp_name" : "RP02-02",
+                                "rp_spendLimit" : 100,
+                                "rp_cpu" : 10,
+                                "rp_mem" : 10,
+                                "rp_disk" : 10
+                            }
+                        ]
+                    }
+                ]
         }
     ]
 }

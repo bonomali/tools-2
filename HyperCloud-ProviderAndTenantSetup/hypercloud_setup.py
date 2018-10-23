@@ -527,116 +527,118 @@ def setup_tenant(url, username, password, tenant_params):
    
     #get registry accounts
     print "Assigning AZ and Resource Pool for tenant: " + new_tenant_data["email"] 
-    if url.endswith('/'):
-        request_url = url + 'api/registryaccounts/'
-    else:
-        request_url = url + '/api/registryaccounts/'
-    req = requests.get(request_url, auth=HTTPBasicAuth(username, password), verify=False)
-    response = req.text
-    parsed_json = json.loads(response)
-    results = parsed_json['results']
-    for value in results:
-        if value["name"] == tenant_params["provider"]:
-            # got the provider
-            # get AZ
-            if url.endswith('/'):
-                request_url = url + 'api/registryaccounts/azs-all/'
-            else:
-                request_url = url + '/api/registryaccounts/azs-all/'
-            
-            request_url = request_url + value["id"]
-            req = requests.get(request_url, auth=HTTPBasicAuth(username, password), verify=False)
-            response = req.text
-            azs_json = json.loads(response)
-
-            for az in azs_json['results']:
-                if az["name"] == tenant_params["default_quota"]['quota_az']:
-                    print "Found AZ: " + az["name"]
-                    # create Quota and RP with AZ
-                    if url.endswith('/'):
-                        request_url = url + 'api/resourcepools'
-                    else:
-                        request_url = url + '/api/resourcepools'
-    
-                    new_quota_data = collections.OrderedDict()
-                    new_quota_data["inactive"] = False
-                    new_quota_data["rpType"] = "QUOTA"
-                    new_quota_data["entitlementType"] = "TENANTS"
-                    new_quota_data["entitledTenants"] = [ tenant_json ]
-                    new_quota_data["quotaType"] = tenant_params["default_quota"]["qouta_type"] # valid quota type is open | restricted
-                    new_quota_data["name"] = "QT." + value["name"].split(".")[0]  + "." + az["name"] + "." + tenant_params["default_quota"]["quota_name"]
-                    new_quota_data["spendLimit"] = tenant_params["default_quota"]["quota_spendLimit"]
-                    new_quota_data["cpu"] = tenant_params["default_quota"]["quota_cpu"]
-                    new_quota_data["mem"] = tenant_params["default_quota"]["quota_mem"]
-                    new_quota_data["disk"] = tenant_params["default_quota"]["quota_disk"]
-                    new_quota_data["azId"] = az["id"]
-                    new_quota_data["azName"] = az["name"]
-                    body = json.dumps(new_quota_data)
-                    headers = {'Content-Type': 'application/json'}
-                    req = requests.post(request_url,  data=body, headers=headers, auth=HTTPBasicAuth(username, password), verify=False)
-                    if not parse_response(req.text):
-                        print "Error Assigning AZ to: " + new_tenant_data["email"]
-                        
-                    quota_json = json.loads(req.text)
-
-                    new_rp_data = collections.OrderedDict()
-                    new_rp_data["inactive"] = False
-                    new_rp_data["rpType"] = "RESOURCE_POOL"
-                    new_rp_data["entitlementType"] = "OWNER"
-                    new_rp_data["entitledTenants"] = []
-                    new_rp_data["entitledUserGroups"] = []
-                    new_rp_data["entitledUsers"] = []
-                    new_rp_data["quotaType"] = "restricted"
-                    new_rp_data["resourcePoolTrigger"] = []
-                    new_rp_data["prefix"] = "RP." + value["name"].split(".")[0]  + "." + az["name"] + "."
-                    new_rp_data["name"] = "RP." + value["name"].split(".")[0]  + "." + az["name"] + "." + tenant_params["default_quota"]["default_rp"]["rp_name"]
-                    new_rp_data["spendLimit"] = tenant_params["default_quota"]["default_rp"]["rp_spendLimit"]
-                    new_rp_data["cpu"] = tenant_params["default_quota"]["default_rp"]["rp_cpu"]
-                    new_rp_data["mem"] = tenant_params["default_quota"]["default_rp"]["rp_mem"]
-                    new_rp_data["disk"] = tenant_params["default_quota"]["default_rp"]["rp_disk"]
-                    new_rp_data["azId"] = quota_json["results"]["id"] # in this case azId is the Quotaid
-                
-                    body = json.dumps(new_rp_data)
-
-                    req = requests.post(request_url,  data=body, headers=headers, auth=HTTPBasicAuth(new_tenant_data["email"], new_tenant_data["password"]), verify=False)
-
-                    if not parse_response(req.text):
-                        print "Error Assigning Resource Pool to: " + new_tenant_data["email"]
-            
-                    break
-            
-            # get non-entitled VPC
-            print "Assigning VPC to: " + new_tenant_data["email"]
-            if url.endswith('/'):
-                request_url = url + 'api/vpc/non-entitled/tenant/'
-            else:
-                request_url = url + '/api/vpc/non-entitled/tenant/'
-            
-            request_url = request_url + tenant_json["id"] + '/'
-            request_url = request_url + 'provider/' + value["accountType"] + '/' + value["id"]
-            req = requests.get(request_url, auth=HTTPBasicAuth(username, password), verify=False)
-            response = req.text
-            vpcs_json = json.loads(response)
-
-            for vpc in vpcs_json['results']:
-                if vpc["name"] == tenant_params["default_quota"]['quota_vpc']:
-                    print "Found VPC: " + vpc["name"]
-                    if url.endswith('/'):
-                        request_url = url + 'api/vpc/'
-                    else:
-                        request_url = url + '/api/vpc/'
-                    request_url = request_url + vpc["id"]
-                    vpc["entitledTenants"] = [ tenant_json ]
-                    vpc["entitlementType"] = "TENANTS"
-                    body = json.dumps(vpc)
-                    headers = {'Content-Type': 'application/json'}
-                    req = requests.put(request_url,  data=body, headers=headers, auth=HTTPBasicAuth(username, password), verify=False)
-                    if not parse_response(req.text):
-                        print "Error Assigning VPC to: " + new_tenant_data["email"]
-                    break
-            break
+    for quota in tenant_params["quotas"]:
+        if url.endswith('/'):
+            request_url = url + 'api/registryaccounts/'
         else:
-            print "Tenant provider not found"
+            request_url = url + '/api/registryaccounts/'
+        req = requests.get(request_url, auth=HTTPBasicAuth(username, password), verify=False)
+        response = req.text
+        parsed_json = json.loads(response)
+        results = parsed_json['results']
+        for value in results:
+            if value["name"] == quota["quota_provider"]:
+                # got the provider
+                # get AZ
+                if url.endswith('/'):
+                    request_url = url + 'api/registryaccounts/azs-all/'
+                else:
+                    request_url = url + '/api/registryaccounts/azs-all/'
+                
+                request_url = request_url + value["id"]
+                req = requests.get(request_url, auth=HTTPBasicAuth(username, password), verify=False)
+                response = req.text
+                azs_json = json.loads(response)
+
+                for az in azs_json['results']:
+                    if az["name"] == quota['quota_az']:
+                        print "Found AZ: " + az["name"]
+                        print "Generating Quota: " + quota["quota_name"] + " with AZ: " + az["name"]
+                        # create Quota and RP with AZ
+                        if url.endswith('/'):
+                            request_url = url + 'api/resourcepools'
+                        else:
+                            request_url = url + '/api/resourcepools'
+        
+                        new_quota_data = collections.OrderedDict()
+                        new_quota_data["inactive"] = False
+                        new_quota_data["rpType"] = "QUOTA"
+                        new_quota_data["entitlementType"] = "TENANTS"
+                        new_quota_data["entitledTenants"] = [ tenant_json ]
+                        new_quota_data["quotaType"] = quota["qouta_type"] # valid quota type is open | restricted
+                        new_quota_data["name"] = "QT." + value["name"].split(".")[0]  + "." + az["name"] + "." + quota["quota_name"]
+                        new_quota_data["spendLimit"] = quota["quota_spendLimit"]
+                        new_quota_data["cpu"] = quota["quota_cpu"]
+                        new_quota_data["mem"] = quota["quota_mem"]
+                        new_quota_data["disk"] = quota["quota_disk"]
+                        new_quota_data["azId"] = az["id"]
+                        new_quota_data["azName"] = az["name"]
+                        body = json.dumps(new_quota_data)
+                        headers = {'Content-Type': 'application/json'}
+                        req = requests.post(request_url,  data=body, headers=headers, auth=HTTPBasicAuth(username, password), verify=False)
+                        if not parse_response(req.text):
+                            print "Error Assigning AZ to: " + new_tenant_data["email"]
+                            
+                        quota_json = json.loads(req.text)
+
+                        for rp in quota["rps"]:
+                            print "Generating Resource Pool: " + rp["rp_name"] + " under Quota: " + quota["quota_name"] + " and user: " + new_tenant_data["email"]
+                            new_rp_data = collections.OrderedDict()
+                            new_rp_data["inactive"] = False
+                            new_rp_data["rpType"] = "RESOURCE_POOL"
+                            new_rp_data["entitlementType"] = "OWNER"
+                            new_rp_data["entitledTenants"] = []
+                            new_rp_data["entitledUserGroups"] = []
+                            new_rp_data["entitledUsers"] = []
+                            new_rp_data["quotaType"] = "restricted"
+                            new_rp_data["resourcePoolTrigger"] = []
+                            new_rp_data["prefix"] = "RP." + value["name"].split(".")[0]  + "." + az["name"] + "."
+                            new_rp_data["name"] = "RP." + value["name"].split(".")[0]  + "." + az["name"] + "." + rp["rp_name"]
+                            new_rp_data["spendLimit"] = rp["rp_spendLimit"]
+                            new_rp_data["cpu"] = rp["rp_cpu"]
+                            new_rp_data["mem"] = rp["rp_mem"]
+                            new_rp_data["disk"] = rp["rp_disk"]
+                            new_rp_data["azId"] = quota_json["results"]["id"] # in this case azId is the Quotaid
+                        
+                            body = json.dumps(new_rp_data)
+
+                            req = requests.post(request_url,  data=body, headers=headers, auth=HTTPBasicAuth(new_tenant_data["email"], new_tenant_data["password"]), verify=False)
+
+                            if not parse_response(req.text):
+                                print "Error Assigning Resource Pool to: " + new_tenant_data["email"]
+                        break
+                
+                # get non-entitled VPC
+                
+                if url.endswith('/'):
+                    request_url = url + 'api/vpc/non-entitled/tenant/'
+                else:
+                    request_url = url + '/api/vpc/non-entitled/tenant/'
+                
+                request_url = request_url + tenant_json["id"] + '/'
+                request_url = request_url + 'provider/' + value["accountType"] + '/' + value["id"]
+                req = requests.get(request_url, auth=HTTPBasicAuth(username, password), verify=False)
+                response = req.text
+                vpcs_json = json.loads(response)
+
+                for vpc in vpcs_json['results']:
+                    if vpc["name"] == quota['quota_vpc']:
+                        print "Found VPC: " + vpc["name"]
+                        print "Assigning VPC: " + quota['quota_vpc'] + " to tenant: " + new_tenant_data["email"]
+                        if url.endswith('/'):
+                            request_url = url + 'api/vpc/'
+                        else:
+                            request_url = url + '/api/vpc/'
+                        request_url = request_url + vpc["id"]
+                        vpc["entitledTenants"] = [ tenant_json ]
+                        vpc["entitlementType"] = "TENANTS"
+                        body = json.dumps(vpc)
+                        headers = {'Content-Type': 'application/json'}
+                        req = requests.put(request_url,  data=body, headers=headers, auth=HTTPBasicAuth(username, password), verify=False)
+                        if not parse_response(req.text):
+                            print "Error Assigning VPC to: " + new_tenant_data["email"]
+                        break
+                break
             
 
 if __name__ == "__main__":
